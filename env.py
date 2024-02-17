@@ -12,27 +12,26 @@ init_y_pos = 50
 def draw_walls(self):
     wall_thickness = 10
     
-    wall = [200+100, 100, wall_thickness, 150] 
-    pygame.draw.rect(self.screen, BLACK, pygame.Rect(*wall))
-    wall = [800-200+100, 100, wall_thickness, 400]
-    pygame.draw.rect(self.screen, BLACK, pygame.Rect(*wall))
-    wall = [350+100, 100, 250, wall_thickness]
-    pygame.draw.rect(self.screen, BLACK, pygame.Rect(*wall))
-    wall = [200+100, 250, 250, wall_thickness]
-    pygame.draw.rect(self.screen, BLACK, pygame.Rect(*wall))
-    wall = [450+100, 250, wall_thickness, 100]
-    pygame.draw.rect(self.screen, BLACK, pygame.Rect(*wall))
-    wall = [0+100, 350, 460, wall_thickness]
-    pygame.draw.rect(self.screen, BLACK, pygame.Rect(*wall))
-    wall = [0+100, 350, wall_thickness, 800-350]
-    pygame.draw.rect(self.screen, BLACK, pygame.Rect(*wall))
-    wall = [150+100, 350+150, 460, wall_thickness]
-    pygame.draw.rect(self.screen, BLACK, pygame.Rect(*wall))
-    wall = [150+100, 500, wall_thickness, 100]
-    pygame.draw.rect(self.screen, BLACK, pygame.Rect(*wall))
-    wall = [10+100, 600-30, 140, 30]
-    pygame.draw.rect(self.screen, [255, 255, 0], pygame.Rect(*wall))
-    
+    self.wall0 = [200+100, 100, wall_thickness, 150]
+    pygame.draw.rect(self.screen, BLACK, pygame.Rect(self.wall0))
+    self.wall1 = [800-200+100, 100, wall_thickness, 400]
+    pygame.draw.rect(self.screen, BLACK, pygame.Rect(self.wall1))
+    self.wall2 = [350+100, 100, 250, wall_thickness]
+    pygame.draw.rect(self.screen, BLACK, pygame.Rect(self.wall2))
+    self.wall3 = [200+100, 250, 250, wall_thickness]
+    pygame.draw.rect(self.screen, BLACK, pygame.Rect(self.wall3))
+    self.wall4 = [450+100, 250, wall_thickness, 100]
+    pygame.draw.rect(self.screen, BLACK, pygame.Rect(self.wall4))
+    self.wall5 = [0+100, 350, 460, wall_thickness]
+    pygame.draw.rect(self.screen, BLACK, pygame.Rect(self.wall5))
+    self.wall6 = [0+100, 350, wall_thickness, 800-350]
+    pygame.draw.rect(self.screen, BLACK, pygame.Rect(self.wall6))
+    self.wall7 = [150+100, 350+150, 460, wall_thickness]
+    pygame.draw.rect(self.screen, BLACK, pygame.Rect(self.wall7))
+    self.wall8 = [150+100, 500, wall_thickness, 100]
+    pygame.draw.rect(self.screen, BLACK, pygame.Rect(self.wall8))
+    self.wall9 = [10+100, 600-30, 140, 30]
+    pygame.draw.rect(self.screen, [255, 255, 0], pygame.Rect(self.wall9))
     
 
 class game_environnement:
