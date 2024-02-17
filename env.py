@@ -12,7 +12,9 @@ def draw_walls(self):
     wall_thickness = 10
     self.walls = []
     self.finish = []
-
+    self.walls.append(pygame.Rect(300, -20, 150, wall_thickness))
+    self.walls.append(pygame.Rect(300, 0, wall_thickness, 150))
+    self.walls.append(pygame.Rect(450, 0, wall_thickness, 100))
     self.walls.append(pygame.Rect(200+100, 100, wall_thickness, 150))
     self.walls.append(pygame.Rect(800-200+100, 100, wall_thickness, 400))
     self.walls.append(pygame.Rect(350+100, 100, 250, wall_thickness))
