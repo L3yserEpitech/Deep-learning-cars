@@ -52,11 +52,12 @@ class game_environnement:
 
 
     def test_collision(self):
-        car_rect = pygame.Rect(self.x_pos, self.y_pos, self.width/6, self.height/6)
+        car_rect = pygame.Rect(self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2, self.width/6, self.height/6)
         for wall in self.walls:
             if car_rect.colliderect(wall):
                 return True
         return False
+
 
     def moove_right(self):
         self.x_pos += 0.1
