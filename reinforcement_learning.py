@@ -20,9 +20,6 @@ gamma = 0.995
 
 episodes = 10
 
-env = game_environnement()
-optim = torch.optim.Adam(network.parameters(), lr=lr)
-
 class NeuralNetwork(nn.Module):
     def __init__(self, env):
         super().__init__()
@@ -87,8 +84,9 @@ class NeuralNetwork(nn.Module):
         # Update the network parameters
         optim.step()
 
+env = game_environnement()
 rl = NeuralNetwork()
-
+optim = torch.optim.Adam(rl.parameters(), lr=lr)
 
 # Iterate over the number of episodes
 for episode in range(episodes):
