@@ -6,7 +6,6 @@ import torch.optim as optim
 import math
 
 BLACK = [0, 0, 0]
-init_x_pos = 365
 init_y_pos = 50
 
 def draw_walls(self):
@@ -51,8 +50,10 @@ class game_environnement:
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 180)
 
         self.width, self.height = self.img_car.get_size()
-        self.x_pos = init_x_pos
-        self.y_pos = init_y_pos
+        self.init_x_pos = 365
+        self.init_y_pos = 50
+        self.x_pos = self.init_x_pos
+        self.y_pos = self.init_y_pos
         self.screen.blit(self.img_car_rotate, (self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2))
 
 
