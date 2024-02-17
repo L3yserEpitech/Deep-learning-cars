@@ -11,6 +11,7 @@ init_y_pos = 50
 def draw_walls(self):
     wall_thickness = 10
     self.walls = []
+    self.finish = []
 
     self.walls.append(pygame.Rect(200+100, 100, wall_thickness, 150))
     self.walls.append(pygame.Rect(800-200+100, 100, wall_thickness, 400))
@@ -21,9 +22,11 @@ def draw_walls(self):
     self.walls.append(pygame.Rect(0+100, 350, wall_thickness, 800-350))
     self.walls.append(pygame.Rect(150+100, 350+150, 460, wall_thickness))
     self.walls.append(pygame.Rect(150+100, 500, wall_thickness, 100))
-    self.walls.append(pygame.Rect(10+100, 600-30, 140, 30))
+    self.finish.append(pygame.Rect(10+100, 600-30, 140, 30))
     for wall in self.walls:
         pygame.draw.rect(self.screen, BLACK, wall)
+    for finish in self.finish:
+        pygame.draw.rect(self.screen, [255, 255, 0], finish)
 
 class game_environnement:
     
@@ -38,7 +41,7 @@ class game_environnement:
         self.screen.fill(self.background_color)
         draw_walls(self)
         self.img_car = pygame.image.load('car.png')
-        self.img_car_scale = pygame.transform.scale(self.img_car, (250/6, 500/6))
+        self.img_car_scale = pygame.transform.scale(self.img_car, (250/9, 500/9))
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 180)
 
         self.width, self.height = self.img_car.get_size()
@@ -52,7 +55,7 @@ class game_environnement:
 
 
     def test_collision(self):
-        car_rect = pygame.Rect(self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2, self.width/6, self.height/6)
+        car_rect = pygame.Rect(self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2, self.width/9, self.height/9)
         for wall in self.walls:
             if car_rect.colliderect(wall):
                 return True
