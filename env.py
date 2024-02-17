@@ -6,6 +6,8 @@ import torch.optim as optim
 import math
 
 BLACK = [0, 0, 0]
+init_x_pos = 365
+init_y_pos = 50
 
 def draw_walls(self):
     wall_thickness = 10
@@ -47,8 +49,45 @@ class game_environnement:
         self.img_car = pygame.image.load('car.png')
         self.img_car_scale = pygame.transform.scale(self.img_car, (150/4.5, 300/4.5))
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 180)
-        self.screen.blit(self.img_car_rotate, (365, 50))
 
+        self.width, self.height = self.img_car.get_size()
+        self.screen.blit(self.img_car_rotate, (init_x_pos - self.width / 2, init_y_pos - self.height / 2))
+
+        self.x_pos = init_x_pos
+        self.y_pos = init_y_pos
+
+        pygame.display.update()
+
+    def moove_right(self):
+        self.x_pos += 0.1
+        self.screen.fill(self.background_color)
+        draw_walls(self)
+        self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*3)
+        self.screen.blit(self.img_car_rotate, (self.x_pos - self.width / 2, self.y_pos - self.height / 2))
+        pygame.display.update()
+    
+    def moove_left(self):
+        self.x_pos -= 0.05
+        self.screen.fill(self.background_color)
+        draw_walls(self)
+        self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*1)
+        self.screen.blit(self.img_car_rotate, (self.x_pos - self.width / 2, self.y_pos - self.height / 2))
+        pygame.display.update()
+    
+    def moove_up(self):
+        self.y_pos -= 0.05
+        self.screen.fill(self.background_color)
+        draw_walls(self)
+        self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*0)
+        self.screen.blit(self.img_car_rotate, (self.x_pos - self.width / 2, self.y_pos - self.height / 2))
+        pygame.display.update()
+    
+    def moove_down(self):
+        self.y_pos += 0.05
+        self.screen.fill(self.background_color)
+        draw_walls(self)
+        self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*2)
+        self.screen.blit(self.img_car_rotate, (self.x_pos - self.width / 2, self.y_pos - self.height / 2))
         pygame.display.update()
         
     def reset(self):
@@ -89,6 +128,16 @@ while running:
             running = False
             break
     state = env.reset()
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_d]:
+        env.moove_right()
+    elif keys[pygame.K_q]:
+        env.moove_left()
+    elif keys[pygame.K_z]:
+        env.moove_up()
+    elif keys[pygame.K_s]:
+        env.moove_down()
 
 
     
