@@ -103,27 +103,23 @@ for episode in range(episodes):
     rl.actions, rl.states, rl.rewards = [], [], []
 
     for i in range(100):
+        print("juste avant mon action les poses sont", env.x_pos, env.y_pos)
         if random.random() < rl.epsilon:
             action = random.randrange(4)
         else :
             action = rl.policy_action(state)
         
         new_state, reward , done = env.step(action)
-        # print("la new_state dans le REINFORCEMENT" ,new_state)
-        # print("la pos dans le REINFORCEMENT" ,env.x_pos, env.y_pos)
+
         env.x_pos = new_state[0]
         env.y_pos = new_state[1]
-        # print("la pos dans le REINFORCEMENT" ,env.x_pos, env.y_pos)
 
         rl.remember(action, state, reward)
 
         state = new_state
 
         if done:
-            print ("je reset\n\n\n") 
-            env.reset()
-            env.my_new_state = (float(env.init_x_pos), float(env.init_y_pos))
-            print ("POS de mes points de départ", env.my_new_state) 
+            print ("je reset !!!") 
             break
 
     rl.epsilon = max(rl.epsilon_end, rl.epsilon_decay * rl.epsilon)
@@ -132,7 +128,7 @@ for episode in range(episodes):
     train_rewards.append(np.sum(rl.rewards))
     recent_rewards.append(train_rewards[-1])
 
-    print(f"Episode {episode:>6}: \tR:{np.mean(recent_rewards):>6.3f}")
+    print(f"Episode {episode:>6}: \tR:{np.mean(recent_rewards):>6.3f}\n")
 
 fig, ax = plt.subplots()
 

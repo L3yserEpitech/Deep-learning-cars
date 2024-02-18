@@ -75,7 +75,7 @@ class game_environnement:
 
 
     def moove_right(self):
-        print("mes poses dans le right", self.x_pos, self.y_pos)
+        print("\tmes poses utilisées dans le right", self.x_pos, self.y_pos)
         self.x_pos += 0.25
         self.screen.fill(self.background_color)
         draw_walls(self)
@@ -86,7 +86,7 @@ class game_environnement:
         return self.x_pos, self.y_pos
     
     def moove_left(self):
-        print("mes poses dans le left", self.x_pos, self.y_pos)
+        print("\tmes poses utilisées dans le left", self.x_pos, self.y_pos)
         self.x_pos -= 0.25
         self.screen.fill(self.background_color)
         draw_walls(self)
@@ -97,8 +97,7 @@ class game_environnement:
         return self.x_pos, self.y_pos
     
     def moove_up(self):
-        # print()
-        print("mes poses dans le up", self.x_pos, self.y_pos)
+        print("\tmes poses utilisées dans le up", self.x_pos, self.y_pos)
         self.y_pos -= 0.25
         self.screen.fill(self.background_color)
         draw_walls(self)
@@ -109,7 +108,7 @@ class game_environnement:
         return self.x_pos, self.y_pos
     
     def moove_down(self):
-        print("mes poses dans le down", self.x_pos, self.y_pos)
+        print("\tmes poses utilisées dans le down", self.x_pos, self.y_pos)
         self.y_pos += 0.25
         self.screen.fill(self.background_color)
         draw_walls(self)
@@ -122,7 +121,7 @@ class game_environnement:
     def reset(self):
         self.x_pos = self.init_x_pos
         self.y_pos = self.init_y_pos
-        print("mes poses dans le resest", self.x_pos, self.y_pos)
+        print("mes poses que je viens de reset dans le reset", self.x_pos, self.y_pos)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 180)
         return (self.x_pos, self.y_pos)
     
@@ -130,19 +129,15 @@ class game_environnement:
         reward = 0
         done = False
         if action in ACTIONS:
-            # print("mon action : ", action)
             self.my_new_state = ACTIONS[action]()
-            print ("Mon New state que je veux la nan", self.my_new_state)
+            print ("Apres mon action, voici mes coordonées retournée", self.my_new_state[0], self.my_new_state[1], "\n")
 
         if self.test_collision(self.my_new_state[0], self.my_new_state[1]):
-            # print("Ca touche")
             reward = -200
             done = True
-            # self.reset()
         elif self.finish_game(self.my_new_state[0], self.my_new_state[1]):
             reward = 1000
             done = True
-            # self.reset()
         else :
             self.finish_center_x = round(self.finish_center_x, 3)
             self.finish_center_y = round(self.finish_center_y, 3)
@@ -166,6 +161,9 @@ ACTIONS = {
     2: env.moove_right,
     3: env.moove_down
 }
+
+
+### SI VOUS VOULEZ JOUER AU JEU, IL FAUT LANCER LE CODE EN BAS AVEC ENV.PY
 
 # i = 0
 # running = True
