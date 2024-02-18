@@ -19,7 +19,7 @@ from scipy.ndimage import gaussian_filter1d
 lr = 1e-3
 gamma = 0.995
 
-episodes = 100
+episodes = 1000
 
 class NeuralNetwork(nn.Module):
     def __init__(self):
@@ -101,7 +101,7 @@ for episode in range(episodes):
     state = env.reset()
     rl.actions, rl.states, rl.rewards = [], [], []
 
-    for i in range(10):
+    for i in range(100):
         if random.random() < rl.epsilon:
             action = random.randrange(4)
         else :

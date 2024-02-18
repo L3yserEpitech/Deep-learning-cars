@@ -107,7 +107,7 @@ class game_environnement:
         draw_walls(self)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*2)
         self.width, self.height = self.img_car.get_size()
-        self.screen.blit(self.img_car_rotate, (self.x_pos - (self.width) / 2, self.y_pos - (self.height) / 2))
+        self.screen.blit(self.img_car_rotate, (self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2))
         pygame.display.update()
         
     def reset(self):
@@ -125,7 +125,7 @@ class game_environnement:
 
         if self.test_collision():
             print("Ca touche")
-            reward = -200
+            reward = -2000000
             done = True
             self.reset()
         elif self.finish_game():
@@ -133,8 +133,18 @@ class game_environnement:
             done = True
             self.reset()
         else :
+            self.finish_center_x = round(self.finish_center_x, 3)
+            self.finish_center_y = round(self.finish_center_y, 3)
+            self.x_pos = round(self.x_pos, 3)
+            self.y_pos = round(self.y_pos, 3)
+
+            # Calculer la distance en utilisant les valeurs arrondies
             dist_to_finish = math.sqrt((self.finish_center_x - self.x_pos) ** 2 + (self.finish_center_y - self.y_pos) ** 2)
-            # print("ma distance de l'arrivée est de : ", -(dist_to_finish / 100))
+
+            # Arrondir la distance à trois chiffres après la virgule
+            dist_to_finish = round(dist_to_finish, 3)
+            # dist_to_finish = math.sqrt((self.finish_center_x - self.x_pos) ** 2 + (self.finish_center_y - self.y_pos) ** 2)
+            print("ma distance de l'arrivée est de : ", (dist_to_finish))
             reward = -(dist_to_finish / 100)
             done = False
 
@@ -150,33 +160,33 @@ ACTIONS = {
     3: env.moove_down
 }
 
-i = 0
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-            break
+# i = 0
+# running = True
+# while running:
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             running = False
+#             break
 
-    keys = pygame.key.get_pressed()
-    action = None 
+#     keys = pygame.key.get_pressed()
+#     action = None 
 
-    if keys[pygame.K_d]:
-        print("right")
-        i = i + 1
-        print (i)
-        action = 2
-    elif keys[pygame.K_q]:
-        print("left")
-        action = 1
-    elif keys[pygame.K_z]:
-        print("up")
-        action = 0
-    elif keys[pygame.K_s]:
-        print("down")
-        action = 3
+#     if keys[pygame.K_d]:
+#         print("right")
+#         i = i + 1
+#         print (i)
+#         action = 2
+#     elif keys[pygame.K_q]:
+#         print("left")
+#         action = 1
+#     elif keys[pygame.K_z]:
+#         print("up")
+#         action = 0
+#     elif keys[pygame.K_s]:
+#         print("down")
+#         action = 3
 
-    if action is not None:
-        env.step(ACTIONS[action]())
+#     if action is not None:
+#         env.step(ACTIONS[action]())
 
 
