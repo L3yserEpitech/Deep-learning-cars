@@ -107,7 +107,7 @@ class game_environnement:
         draw_walls(self)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*2)
         self.width, self.height = self.img_car.get_size()
-        self.screen.blit(self.img_car_rotate, (self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2))
+        self.screen.blit(self.img_car_rotate, (self.x_pos - (self.width) / 2, self.y_pos - (self.height) / 2))
         pygame.display.update()
         
     def reset(self):
@@ -117,10 +117,14 @@ class game_environnement:
         return (self.x_pos, self.y_pos)
     
     def step(self, action):
+        reward = 0
+        done = False
         if action in ACTIONS:
+            print("mon action : ", action)
             ACTIONS[action]()
 
         if self.test_collision():
+            print("Ca touche")
             reward = -200
             done = True
             self.reset()
@@ -146,33 +150,33 @@ ACTIONS = {
     3: env.moove_down
 }
 
-# i = 0
-# running = True
-# while running:
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             running = False
-#             break
+i = 0
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            break
 
-#     keys = pygame.key.get_pressed()
-#     action = None 
+    keys = pygame.key.get_pressed()
+    action = None 
 
-#     if keys[pygame.K_d]:
-#         print("right")
-#         i = i + 1
-#         print (i)
-#         action = 2
-#     elif keys[pygame.K_q]:
-#         print("left")
-#         action = 1
-#     elif keys[pygame.K_z]:
-#         print("up")
-#         action = 0
-#     elif keys[pygame.K_s]:
-#         print("down")
-#         action = 3
+    if keys[pygame.K_d]:
+        print("right")
+        i = i + 1
+        print (i)
+        action = 2
+    elif keys[pygame.K_q]:
+        print("left")
+        action = 1
+    elif keys[pygame.K_z]:
+        print("up")
+        action = 0
+    elif keys[pygame.K_s]:
+        print("down")
+        action = 3
 
-#     if action is not None:
-#         env.step(ACTIONS[action]())
+    if action is not None:
+        env.step(ACTIONS[action]())
 
 
