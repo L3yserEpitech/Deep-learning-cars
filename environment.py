@@ -75,7 +75,7 @@ class game_environnement:
 
 
     def moove_right(self):
-        self.x_pos += 0.1
+        self.x_pos += 3
         self.screen.fill(self.background_color)
         draw_walls(self)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*3)
@@ -84,7 +84,7 @@ class game_environnement:
         pygame.display.update()
     
     def moove_left(self):
-        self.x_pos -= 0.1
+        self.x_pos -= 3
         self.screen.fill(self.background_color)
         draw_walls(self)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*1)
@@ -93,7 +93,7 @@ class game_environnement:
         pygame.display.update()
     
     def moove_up(self):
-        self.y_pos -= 0.1
+        self.y_pos -= 3
         self.screen.fill(self.background_color)
         draw_walls(self)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*0)
@@ -102,7 +102,7 @@ class game_environnement:
         pygame.display.update()
     
     def moove_down(self):
-        self.y_pos += 0.1
+        self.y_pos += 3
         self.screen.fill(self.background_color)
         draw_walls(self)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*2)
