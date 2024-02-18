@@ -4,7 +4,8 @@
 ## File description:
 ## reinforcement_learning.py
 ##
-
+import environment
+import random
 import numpy as np
 import torch
 import torch.nn as nn
@@ -18,31 +19,49 @@ from scipy.ndimage import gaussian_filter1d
 lr = 1e-3
 gamma = 0.995
 
-episodes = 10
+episodes = 500
 
 class NeuralNetwork(nn.Module):
-    def __init__(self, env):
+    def __init__(self):
         super().__init__()
 
-        self.lin1 = nn.Linear(1, 4)
-        self.batch1 = nn.BatchNorm1d(4)
-        self.lin2 = nn.Linear(4, 8)
-        self.batch2 = nn.BatchNorm1d(8)
-        self.lin3 = nn.Linear(8, 4) #le 4 signifie le nombre d'actions que l'ont peut faire 
+        self.lin1 = nn.Linear(2, 64)
+        self.batch1 = nn.LayerNorm(64)
+
+        self.lin2 = nn.Linear(64, 128)
+        self.batch2 = nn.LayerNorm(128)
+
+        self.lin3 = nn.Linear(128, 256)
+        self.batch3 = nn.LayerNorm(256)
+
+        self.lin4 = nn.Linear(256, 128)  
+        self.batch4 = nn.LayerNorm(128)
+
+        self.lin5 = nn.Linear(128, 64)  
+        self.batch5 = nn.LayerNorm(64)
+
+        self.lin6 = nn.Linear(64, 4)  
 
         self.actions, self.states, self.rewards = [],[],[]
+        self.epsilon = 1.0
+        self.epsilon_end = 0.01
+        self.epsilon_decay = 0.950
     
     def forward(self, x):
-        x = x.float()
+        # x = x.float()
         x = F.relu(self.batch1(self.lin1(x)))
         x = F.relu(self.batch2(self.lin2(x)))
-        x = F.softmax(self.lin3(x), dim = -1)
+        x = F.relu(self.batch3(self.lin3(x)))
+        x = F.relu(self.batch4(self.lin4(x)))
+        x = F.relu(self.batch5(self.lin5(x)))
+        x = F.softmax(self.lin6(x), dim = -1)
         return x
     
     def policy_action(self, state):
+        state = torch.FloatTensor([state])
         probability = self.forward(state)
         categories = Categorical(probability)
-        act = m.sample()
+        act = categories.sample()
         return act.item()
     
     def remember(self, Action, State, Reward):
@@ -57,72 +76,53 @@ class NeuralNetwork(nn.Module):
             R = r + gamma * R
             dc_reward.insert(0, R)
         self.rewards = dc_reward
+        return dc_reward
 
-    def gradient_ascent(self, discounted_rewards):
-        # Perform gradient ascent to update the probabilities in the distribution
-        optim.zero_grad()  # Clear the gradients before backward pass
-        for state, action, G in zip(self.states, self.actions, discounted_rewards):
-            # Convert the state to a PyTorch tensor
+    def gradient_ascent(self, dc_reward):
+        optim.zero_grad()
+        for state, action, G in zip(self.states, self.actions, dc_reward):
             state_tensor = torch.FloatTensor(state).unsqueeze(0)
-            
-            # Get the probabilities for the current state
             probs = self.forward(state_tensor)
-            
-            # Create a distribution according to the probabilities
             m = torch.distributions.Categorical(probs)
-            
-            # Calculate the negative log probability of the chosen action
             log_prob = m.log_prob(torch.tensor(action))
-            
-            # Calculate the loss as the negative log probability of the chosen action
-            # multiplied by the discounted return
+
             loss = -log_prob * G
-            
-            # Perform backpropagation
             loss.backward()
-        
-        # Update the network parameters
         optim.step()
 
-env = game_environnement()
+
+train_rewards = []
+recent_rewards = []
+env = environment.game_environnement()
 rl = NeuralNetwork()
 optim = torch.optim.Adam(rl.parameters(), lr=lr)
 
-# Iterate over the number of episodes
 for episode in range(episodes):
-    # Reset the environment and initialize empty lists for actions, states, and rewards
-    state, _  = env.reset()
-    network.actions, network.states, network.rewards = [], [], []
+    state = env.reset()
+    rl.actions, rl.states, rl.rewards = [], [], []
 
-    # Train the agent for a single episode
-    for _ in range(1000):
-        action = network.policy_action(state)
+    for i in range(1000):
+        if random.random() < rl.epsilon:
+            action = random.randrange(4)
+        else :
+            action = rl.policy_action(state)
 
-        # Take the action in the environment and get the new state, reward, and done flag
-        new_state, reward, termination, truncation, _ = env.step(action)
+        new_state, reward , done = env.step(action)
 
-        # Save the action, state, and reward for later
-        network.remember(action, state, reward)
+        rl.remember(action, state, reward)
 
         state = new_state
 
-        # If the episode is done or the time limit is reached, stop training
-        if termination or truncation:
+        if done:
             break
 
-    # Perform gradient ascent
-    network.gradient_ascent(network.discount_rewards())
+    rl.epsilon = max(rl.epsilon_end, rl.epsilon_decay * rl.epsilon)
+    rl.gradient_ascent(rl.discount_rewards())
 
-    # Save the total reward for the episode and append it to the recent rewards queue
-    train_rewards.append(np.sum(network.rewards))
+    train_rewards.append(np.sum(rl.rewards))
     recent_rewards.append(train_rewards[-1])
 
-    # Print the mean recent reward every 50 episodes
-    if episode % 50 == 0:
-        print(f"Episode {episode:>6}: \tR:{np.mean(recent_rewards):>6.3f}")
-
-    # if np.mean(recent_rewards) > 400:
-    #     break
+    print(f"Episode {episode:>6}: \tR:{np.mean(recent_rewards):>6.3f}")
 
 fig, ax = plt.subplots()
 
@@ -132,36 +132,36 @@ ax.set_title('Rewards')
 
 fig.show()
 
-env = gym.make(env_name, render_mode="human")
+# # env = gym.make(env_name, render_mode="human")
 
-for _ in range(5):
-    Rewards = []
+# for _ in range(5):
+#     Rewards = []
     
-    state, _ = env.reset()
-    done = False
+#     state = env.reset()
+#     done = False
     
-    for _ in range(1000):
-        # Calculate the probabilities of taking each action using the trained
-        # neural network
-        state_tensor = torch.from_numpy(state).float()
-        probs = network.forward(state_tensor)
+#     for _ in range(1000):
+#         # Calculate the probabilities of taking each action using the trained
+#         # neural network
+#         state_tensor = torch.from_numpy(state).float()
+#         probs = rl.forward(state_tensor)
         
-        # Sample an action from the resulting distribution using the 
-        # torch.distributions.Categorical() method
-        m = torch.distributions.Categorical(probs)
-        action = m.sample().item()  # Sample an action from the distribution
+#         # Sample an action from the resulting distribution using the 
+#         # torch.distributions.Categorical() method
+#         m = torch.distributions.Categorical(probs)
+#         action = m.sample().item()  # Sample an action from the distribution
     
-        new_state, reward, termination, truncation, _ = env.step(action)
+#         new_state, reward, done= env.step(action)
     
-        state = new_state
+#         state = new_state
 
-        Rewards.append(reward)
+#         Rewards.append(reward)
 
-        if termination or truncation:
-            break
+#         if done:
+#             break
     
-    # Print the total rewards for the current episode
-    print(f'Reward: {sum(Rewards)}')
+#     # Print the total rewards for the current episode
+#     print(f'Reward: {sum(Rewards)}')
 
-# Close the environment
+# # Close the environment
 env.close()

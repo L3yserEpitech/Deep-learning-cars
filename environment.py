@@ -7,6 +7,7 @@ import math
 
 BLACK = [0, 0, 0]
 init_y_pos = 50
+reward = 0
 
 def draw_walls(self):
     wall_thickness = 10
@@ -52,6 +53,8 @@ class game_environnement:
         self.x_pos = self.init_x_pos
         self.y_pos = self.init_y_pos
         self.screen.blit(self.img_car_rotate, (self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2))
+        self.finish_center_x = self.finish[0].x + self.finish[0].width / 2
+        self.finish_center_y = self.finish[0].y + self.finish[0].height / 2
 
         pygame.display.update()
 
@@ -61,6 +64,13 @@ class game_environnement:
         for wall in self.walls:
             if car_rect.colliderect(wall):
                 return True
+        return False
+
+    def finish_game(self):
+        car_rect = pygame.Rect(self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2, self.width/9, self.height/9)
+        if car_rect.colliderect(self.finish[0]):
+            print("win")
+            return True
         return False
 
 
@@ -101,53 +111,68 @@ class game_environnement:
         pygame.display.update()
         
     def reset(self):
-        # Réinitialiser le jeu et retourner l'état initial
-        pass
-        # return initial_state
+        self.x_pos = self.init_x_pos
+        self.y_pos = self.init_y_pos
+        self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 180)
+        return (self.x_pos, self.y_pos)
     
     def step(self, action):
-        # Appliquer l'action et retourner le nouvel état, la récompense et si le jeu est terminé
-        pass
-        # return new_state, reward, done
-    
-    def render(self):
-        # Afficher le jeu
-        pygame.display.update()
-    
-    def close(self):
-        # Fermer proprement le jeu
-        pygame.quit()
-    
-class my_model(nn.Module):
-    def __init__(self):
-        super(my_model, self).__init__()
-        # Définir l'architecture du modèle
-        pass
-    
-    def forward(self, x):
-        # Implémenter la propagation avant
-        pass
+        if action in ACTIONS:
+            ACTIONS[action]()
+
+        if self.test_collision():
+            reward = -200
+            done = True
+            self.reset()
+        elif self.finish_game():
+            reward = 1000
+            done = True
+            self.reset()
+        else :
+            dist_to_finish = math.sqrt((self.finish_center_x - self.x_pos) ** 2 + (self.finish_center_y - self.y_pos) ** 2)
+            # print("ma distance de l'arrivée est de : ", -(dist_to_finish / 100))
+            reward = -(dist_to_finish / 100)
+            done = False
+
+        new_state = (self.x_pos, self.y_pos)
+        return new_state, reward, done
     
 env = game_environnement()
-model = my_model()
 
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-            break
-    state = env.reset()
+ACTIONS = {
+    0: env.moove_up,
+    1: env.moove_left,
+    2: env.moove_right,
+    3: env.moove_down
+}
 
-    if env.test_collision():
-        env.x_pos = env.init_x_pos
-        env.y_pos = env.init_y_pos
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_d]:
-        env.moove_right()
-    elif keys[pygame.K_q]:
-        env.moove_left()
-    elif keys[pygame.K_z]:
-        env.moove_up()
-    elif keys[pygame.K_s]:
-        env.moove_down()
+# i = 0
+# running = True
+# while running:
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             running = False
+#             break
+
+#     keys = pygame.key.get_pressed()
+#     action = None 
+
+#     if keys[pygame.K_d]:
+#         print("right")
+#         i = i + 1
+#         print (i)
+#         action = 2
+#     elif keys[pygame.K_q]:
+#         print("left")
+#         action = 1
+#     elif keys[pygame.K_z]:
+#         print("up")
+#         action = 0
+#     elif keys[pygame.K_s]:
+#         print("down")
+#         action = 3
+
+#     if action is not None:
+#         env.step(ACTIONS[action]())
+
+
