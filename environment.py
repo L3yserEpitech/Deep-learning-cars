@@ -50,8 +50,8 @@ class game_environnement:
         self.width, self.height = self.img_car.get_size()
         self.init_x_pos = 365
         self.init_y_pos = 50
-        self.x_pos = self.init_x_pos
-        self.y_pos = self.init_y_pos
+        self.x_pos = float(self.init_x_pos)
+        self.y_pos = float(self.init_y_pos)
         self.screen.blit(self.img_car_rotate, (self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2))
         self.finish_center_x = self.finish[0].x + self.finish[0].width / 2
         self.finish_center_y = self.finish[0].y + self.finish[0].height / 2
@@ -59,15 +59,15 @@ class game_environnement:
         pygame.display.update()
 
 
-    def test_collision(self):
-        car_rect = pygame.Rect(self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2, self.width/9, self.height/9)
+    def test_collision(self, pos_x, pos_y):
+        car_rect = pygame.Rect(pos_x - (self.width/5) / 2, pos_y - (self.height/5) / 2, self.width/9, self.height/9)
         for wall in self.walls:
             if car_rect.colliderect(wall):
                 return True
         return False
 
-    def finish_game(self):
-        car_rect = pygame.Rect(self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2, self.width/9, self.height/9)
+    def finish_game(self, pos_x, pos_y):
+        car_rect = pygame.Rect(pos_x - (self.width/5) / 2, pos_y - (self.height/5) / 2, self.width/9, self.height/9)
         if car_rect.colliderect(self.finish[0]):
             print("win")
             return True
@@ -75,44 +75,54 @@ class game_environnement:
 
 
     def moove_right(self):
-        self.x_pos += 3
+        print("mes poses dans le right", self.x_pos, self.y_pos)
+        self.x_pos += 0.25
         self.screen.fill(self.background_color)
         draw_walls(self)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*3)
         self.width, self.height = self.img_car.get_size()
         self.screen.blit(self.img_car_rotate, (self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2))
         pygame.display.update()
+        return self.x_pos, self.y_pos
     
     def moove_left(self):
-        self.x_pos -= 3
+        print("mes poses dans le left", self.x_pos, self.y_pos)
+        self.x_pos -= 0.25
         self.screen.fill(self.background_color)
         draw_walls(self)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*1)
         self.width, self.height = self.img_car.get_size()
         self.screen.blit(self.img_car_rotate, (self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2))
         pygame.display.update()
+        return self.x_pos, self.y_pos
     
     def moove_up(self):
-        self.y_pos -= 3
+        # print()
+        print("mes poses dans le up", self.x_pos, self.y_pos)
+        self.y_pos -= 0.25
         self.screen.fill(self.background_color)
         draw_walls(self)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*0)
         self.width, self.height = self.img_car.get_size()
         self.screen.blit(self.img_car_rotate, (self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2))
         pygame.display.update()
+        return self.x_pos, self.y_pos
     
     def moove_down(self):
-        self.y_pos += 3
+        print("mes poses dans le down", self.x_pos, self.y_pos)
+        self.y_pos += 0.25
         self.screen.fill(self.background_color)
         draw_walls(self)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 90*2)
         self.width, self.height = self.img_car.get_size()
         self.screen.blit(self.img_car_rotate, (self.x_pos - (self.width/5) / 2, self.y_pos - (self.height/5) / 2))
         pygame.display.update()
+        return self.x_pos, self.y_pos
         
     def reset(self):
         self.x_pos = self.init_x_pos
         self.y_pos = self.init_y_pos
+        print("mes poses dans le resest", self.x_pos, self.y_pos)
         self.img_car_rotate = pygame.transform.rotate(self.img_car_scale, 180)
         return (self.x_pos, self.y_pos)
     
@@ -120,36 +130,33 @@ class game_environnement:
         reward = 0
         done = False
         if action in ACTIONS:
-            print("mon action : ", action)
-            ACTIONS[action]()
+            # print("mon action : ", action)
+            self.my_new_state = ACTIONS[action]()
+            print ("Mon New state que je veux la nan", self.my_new_state)
 
-        if self.test_collision():
-            print("Ca touche")
-            reward = -2000000
+        if self.test_collision(self.my_new_state[0], self.my_new_state[1]):
+            # print("Ca touche")
+            reward = -200
             done = True
-            self.reset()
-        elif self.finish_game():
+            # self.reset()
+        elif self.finish_game(self.my_new_state[0], self.my_new_state[1]):
             reward = 1000
             done = True
-            self.reset()
+            # self.reset()
         else :
             self.finish_center_x = round(self.finish_center_x, 3)
             self.finish_center_y = round(self.finish_center_y, 3)
-            self.x_pos = round(self.x_pos, 3)
-            self.y_pos = round(self.y_pos, 3)
+            new_x = round(self.my_new_state[0], 3)
+            new_y = round(self.my_new_state[1], 3)
 
-            # Calculer la distance en utilisant les valeurs arrondies
-            dist_to_finish = math.sqrt((self.finish_center_x - self.x_pos) ** 2 + (self.finish_center_y - self.y_pos) ** 2)
+            dist_to_finish = math.sqrt((self.finish_center_x - new_x) ** 2 + (self.finish_center_y - new_y) ** 2)
 
-            # Arrondir la distance à trois chiffres après la virgule
             dist_to_finish = round(dist_to_finish, 3)
-            # dist_to_finish = math.sqrt((self.finish_center_x - self.x_pos) ** 2 + (self.finish_center_y - self.y_pos) ** 2)
-            print("ma distance de l'arrivée est de : ", (dist_to_finish))
+            # print("ma distance de l'arrivée est de : ", (dist_to_finish))
             reward = -(dist_to_finish / 100)
             done = False
-
-        new_state = (self.x_pos, self.y_pos)
-        return new_state, reward, done
+        print("mon Done est à ", done )
+        return self.my_new_state, reward, done
     
 env = game_environnement()
 
@@ -187,6 +194,4 @@ ACTIONS = {
 #         action = 3
 
 #     if action is not None:
-#         env.step(ACTIONS[action]())
-
-
+#         wesh, salut, cava = env.step(action)

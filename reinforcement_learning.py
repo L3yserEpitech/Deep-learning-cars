@@ -5,6 +5,7 @@
 ## reinforcement_learning.py
 ##
 import environment
+from environment import ACTIONS
 import random
 import numpy as np
 import torch
@@ -106,14 +107,23 @@ for episode in range(episodes):
             action = random.randrange(4)
         else :
             action = rl.policy_action(state)
-
+        
         new_state, reward , done = env.step(action)
+        # print("la new_state dans le REINFORCEMENT" ,new_state)
+        # print("la pos dans le REINFORCEMENT" ,env.x_pos, env.y_pos)
+        env.x_pos = new_state[0]
+        env.y_pos = new_state[1]
+        # print("la pos dans le REINFORCEMENT" ,env.x_pos, env.y_pos)
 
         rl.remember(action, state, reward)
 
         state = new_state
 
         if done:
+            print ("je reset\n\n\n") 
+            env.reset()
+            env.my_new_state = (float(env.init_x_pos), float(env.init_y_pos))
+            print ("POS de mes points de départ", env.my_new_state) 
             break
 
     rl.epsilon = max(rl.epsilon_end, rl.epsilon_decay * rl.epsilon)
